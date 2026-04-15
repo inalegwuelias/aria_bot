@@ -1,0 +1,14 @@
+langchain
+langchain-core
+langchain-community
+unstructured
+markdown
+langchain-text-splitters
+sentence-transformers
+faiss-cpu
+chromadb
+langchain-groq
+langchain_core
+python-dotenv
+discord.py
+numpy
