@@ -3,8 +3,8 @@ app.py — Entry point. Wires the RAG pipeline into the Discord bot.
 
 Startup sequence
 ────────────────
-1.  Validate env vars (fast-fail before loading heavy models)
-2.  Start keep-alive server (Render port detection)
+1.  Start keep-alive server FIRST (Render port detection)
+2.  Validate env vars (fast-fail before loading heavy models)
 3.  Load & chunk documents from DATA_DIR
 4.  Build EmbeddingManager  (downloads model on first run)
 5.  Build VectorStore       (opens or creates ChromaDB collection)
@@ -18,6 +18,12 @@ Startup sequence
 No RAG or Discord logic lives here — app.py is pure glue.
 """
 
+# ── Keep Alive MUST be imported and started before anything else ──────────────
+from bot import create_bot, keep_alive
+keep_alive()
+
+
+# ── All other imports ─────────────────────────────────────────────────────────
 import config
 from src import (
     load_documents,
@@ -26,18 +32,12 @@ from src import (
     VectorStore,
     RAGRetriever,
 )
-from bot import create_bot, keep_alive
-
 from langchain_groq import ChatGroq
 from langchain_core.messages import SystemMessage, HumanMessage
 
 
-# ── Step 1 — Validate env vars ────────────────────────────────────────────────
+# ── Step 2 — Validate env vars ────────────────────────────────────────────────
 config.validate()
-
-
-# ── Step 2 — Start keep-alive server FIRST (Render port detection) ────────────
-keep_alive()
 
 
 # ── Step 3 — Load and chunk documents ────────────────────────────────────────
