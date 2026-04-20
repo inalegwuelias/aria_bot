@@ -12,4 +12,3 @@ langchain_core
 python-dotenv
 discord.py
 numpy
-flask

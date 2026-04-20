@@ -5,7 +5,6 @@ Responsibilities:
   - Define intents, client, and event handlers
   - Accept the RAG answer function via dependency injection
   - Own ALL Discord-specific logic (mention parsing, typing indicator, etc.)
-  - Provide keep_alive() for Render port binding
 
 Design contract:
   - bot.py imports NOTHING from rag/ or app.py
@@ -13,34 +12,9 @@ Design contract:
   - This makes bot.py independently testable without a running RAG pipeline
 """
 
-import os
 import asyncio
 import discord
-from flask import Flask
-from threading import Thread
 
-
-# ── Keep Alive Server ──────────────────────────────────────────────────────────
-
-_app = Flask(__name__)
-
-@_app.route('/')
-def home():
-    return "Aria is alive!"
-
-def _run():
-    port = int(os.environ.get('PORT', 10000))
-    print(f"\n🌐 Flask starting on port {port}...")
-    _app.run(host='0.0.0.0', port=port, use_reloader=False)
-
-def keep_alive():
-    t = Thread(target=_run)
-    t.daemon = True
-    t.start()
-    print(f"\n🌐 Keep-alive thread launched")
-
-
-# ── Bot Factory ────────────────────────────────────────────────────────────────
 
 def create_bot(answer_fn) -> discord.Client:
     """
@@ -56,11 +30,11 @@ def create_bot(answer_fn) -> discord.Client:
         A discord.Client instance ready to be started with bot.run(token).
     """
     intents = discord.Intents.default()
-    intents.message_content = True
+    intents.message_content = True     # required to read message text
 
     bot = discord.Client(intents=intents)
 
-    # ── Events ──────────────────────────────────────────────────────────────
+    # ── Events ─────────────────────────────────────────────────────────────
 
     @bot.event
     async def on_ready() -> None:
