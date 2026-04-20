@@ -17,7 +17,7 @@ Startup sequence
 No RAG or Discord logic lives here — app.py is pure glue.
 """
 
-import config                                  # validate + constants
+import config
 from src import (
     load_documents,
     split_documents,
@@ -25,7 +25,7 @@ from src import (
     VectorStore,
     RAGRetriever,
 )
-from bot import create_bot
+from bot import create_bot, keep_alive
 
 from langchain_groq import ChatGroq
 from langchain_core.messages import SystemMessage, HumanMessage
@@ -93,7 +93,6 @@ def answer_fn(query: str) -> str:
     if not retrieved:
         return config.FALLBACK_NO_DOCS
 
-    # Build LLM context from top-scored chunks
     context = "\n\n".join(doc["text"] for doc in retrieved)
 
     messages = [
@@ -119,4 +118,5 @@ print("\n✅ Aria is fully initialised and ready.\n")
 
 # ── Step 10 — Run ─────────────────────────────────────────────────────────────
 if __name__ == "__main__":
+    keep_alive()        # 👈 start the ping server
     bot.run(config.DISCORD_TOKEN)

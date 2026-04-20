@@ -14,7 +14,29 @@ Design contract:
 
 import asyncio
 import discord
+from flask import Flask
+from threading import Thread
 
+
+# ── Keep Alive Server ──────────────────────────────────────────────────────────
+
+_app = Flask(__name__)
+
+@_app.route('/')
+def home():
+    return "Aria is alive!"
+
+def _run():
+    _app.run(host='0.0.0.0', port=8080)
+
+def keep_alive():
+    t = Thread(target=_run)
+    t.daemon = True    # shuts down cleanly when the bot stops
+    t.start()
+    print("\n🌐 Keep-alive server started on port 8080")
+
+
+# ── Bot Factory ────────────────────────────────────────────────────────────────
 
 def create_bot(answer_fn) -> discord.Client:
     """
@@ -30,11 +52,11 @@ def create_bot(answer_fn) -> discord.Client:
         A discord.Client instance ready to be started with bot.run(token).
     """
     intents = discord.Intents.default()
-    intents.message_content = True     # required to read message text
+    intents.message_content = True
 
     bot = discord.Client(intents=intents)
 
-    # ── Events ─────────────────────────────────────────────────────────────
+    # ── Events ──────────────────────────────────────────────────────────────
 
     @bot.event
     async def on_ready() -> None:
