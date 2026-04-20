@@ -29,14 +29,15 @@ def home():
     return "Aria is alive!"
 
 def _run():
-    port = int(os.environ.get('PORT', 8080))   # Render assigns PORT dynamically
-    _app.run(host='0.0.0.0', port=port)
+    port = int(os.environ.get('PORT', 10000))
+    print(f"\n🌐 Flask starting on port {port}...")
+    _app.run(host='0.0.0.0', port=port, use_reloader=False)
 
 def keep_alive():
     t = Thread(target=_run)
-    t.daemon = True    # shuts down cleanly when the bot stops
+    t.daemon = True
     t.start()
-    print("\n🌐 Keep-alive server started on port", os.environ.get('PORT', 8080))
+    print(f"\n🌐 Keep-alive thread launched")
 
 
 # ── Bot Factory ────────────────────────────────────────────────────────────────
